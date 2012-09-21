@@ -1,0 +1,32 @@
+=head1 SYNOPSIS
+
+    package MyStore;
+
+    use Moose;
+
+    extends 'DBIx::NoSQL::Store::Manager';
+
+    __PACKAGE__->meta->make_immutable;
+
+=head1 DESCRIPTION
+
+Just like L<DBIx::NoSQL> is a layer providing the
+flexibility of a NoSQL store on top of L<DBIx::Class>, I<DBIx::NoSQL::Store::Manager>
+provides a mechanism to drop and retrieve L<Moose> objects from that store.
+
+As can be seen in the L</SYNOPSIS>, the store class itself is typically fairly
+bare; most of the work is done by L<DBIx::NoSQL::Store::Manager::Model>, the
+role the models (i.e., the classes to be stored in the database) must consume.
+
+I<DBIx::NoSQL::Store::Manager> extends L<DBIx::NoSQL> and inherits all its
+methods.
+
+=head1 SEE ALSO
+
+* Original blog entry introducing the module: L<http://babyl.dyndns.org/techblog/entry/shaving-the-white-whale>
+
+=head2 Similar Modules
+
+* L<KiokuDB>
+
+* L<Elastic::Model>
