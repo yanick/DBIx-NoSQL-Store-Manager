@@ -113,7 +113,7 @@ method _entity {
 
 method indexes {
     return map  { [ $_->name, ( isa => $_->store_isa ) x $_->has_store_isa ] }
-           grep { $_->does('DBIx::NoSQL::Store::Model::Role::StoreIndex') } 
+           grep { $_->does('DBIx::NoSQL::Store::Manager::StoreIndex') } 
                 $self->meta->get_all_attributes;
 }
 

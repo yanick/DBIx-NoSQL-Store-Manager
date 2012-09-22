@@ -8,7 +8,7 @@ use File::Temp qw/ tempdir /;
 
 use MyComics;
 
-plan tests => 4;
+plan tests => 5;
 
 my $store = MyComics->new;
 
@@ -36,4 +36,6 @@ $store->new_model_object( 'Comic',
 ok $store->exists( Comic => 'One Bloody Year-1' ), 'OBY';
 ok $store->exists( Comic => 'Terra Obscura-2' ), 'TO';
 
+use Data::Printer;
 
+is_deeply [ MyComics::Model::Comic->indexes ] => [ [ 'penciler' ] ], 'indexes';
