@@ -1,7 +1,0 @@
-^dist.ini
-^MANIFEST.SKIP
-DBIx-NoSQL-Store-Manager.*
-^\.gitignore
-^\.git
-^\.build
-

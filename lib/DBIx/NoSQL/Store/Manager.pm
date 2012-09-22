@@ -1,4 +1,10 @@
 package DBIx::NoSQL::Store::Manager;
+BEGIN {
+  $DBIx::NoSQL::Store::Manager::AUTHORITY = 'cpan:YANICK';
+}
+{
+  $DBIx::NoSQL::Store::Manager::VERSION = '0.1.0';
+}
 #ABSTRACT: DBIx::NoSQL as a Moose object store 
 
 use strict;
@@ -14,38 +20,6 @@ use Module::Pluggable require => 1;
 
 extends 'DBIx::NoSQL::Store';
 
-=method new( models => \@classes )
-
-Creates a new store manager.
-
-=head3 Arguments
-
-=over
-
-=item models => \@classes
-=item models => $class
-
-Classes to be imported as models for the store. Namespaces can also be given
-with a trailing C<::>, in which case all modules found under that namespace
-will be imported.  If only one class is to be used, it can be passed as a
-single string.
-
-If not given, defaults
-to the C<Model> sub-namespace under the store's (e.g., for store
-class C<MyStore>, that would be C<MyStore::Model::>). 
-
-    my $store = MyStore->new; 
-        # will import MyStore::Model::*
-    
-    my $store = MyStore->new( models => [ 'Foo::Bar', 'Something::Else' ] );
-        # imports specific classes
-        
-    my $store = MyStore->new( models => [ 'Foo::Bar', 'MyStore::Model::' ] );
-        # imports Foo::Bar and all classes under MyStore::Model::*
-
-=back
-
-=cut
 
 subtype Model
     => as 'ArrayRef[Str]';
@@ -66,19 +40,6 @@ has models => (
     },
 );
 
-=method model_names()
-
-Returns the name of all models known to the store.
-
-=method model_classes()
-
-Returns the full class name of all models known to the store.
-
-=method model_class( $name )
-
-Returns the full class name of the given model.
-
-=cut
 
 has _models => (
     traits => [ 'Hash' ],
@@ -123,18 +84,120 @@ method BUILD(@args) {
     }
 };
 
-=method new_model_object( $model_name, @args )
-
-Shortcut constructor for a model class of the store. Equivalent to
-
-    my $class = $store->model_class( $model_name );
-    my $thingy = $class->new( store_db => $store, @args );
-
-=cut
 
 method new_model_object ( $model, @args ) {
     $self->model_class($model)->new( store_db => $self, @args);   
 }
 
 1;
+
+
+__END__
+=pod
+
+=head1 NAME
+
+DBIx::NoSQL::Store::Manager - DBIx::NoSQL as a Moose object store 
+
+=head1 VERSION
+
+version 0.1.0
+
+=head1 SYNOPSIS
+
+    package MyStore;
+
+    use Moose;
+
+    extends 'DBIx::NoSQL::Store::Manager';
+
+    __PACKAGE__->meta->make_immutable;
+
+=head1 DESCRIPTION
+
+Just like L<DBIx::NoSQL> is a layer providing the
+flexibility of a NoSQL store on top of L<DBIx::Class>, I<DBIx::NoSQL::Store::Manager>
+provides a mechanism to drop and retrieve L<Moose> objects from that store.
+
+As can be seen in the L</SYNOPSIS>, the store class itself is typically fairly
+bare; most of the work is done by L<DBIx::NoSQL::Store::Manager::Model>, the
+role the models (i.e., the classes to be stored in the database) must consume.
+
+I<DBIx::NoSQL::Store::Manager> extends L<DBIx::NoSQL> and inherits all its
+methods.
+
+=head1 METHODS
+
+=head2 new( models => \@classes )
+
+Creates a new store manager.
+
+=head3 Arguments
+
+=over
+
+=item models => \@classes
+=item models => $class
+
+Classes to be imported as models for the store. Namespaces can also be given
+with a trailing C<::>, in which case all modules found under that namespace
+will be imported.  If only one class is to be used, it can be passed as a
+single string.
+
+If not given, defaults
+to the C<Model> sub-namespace under the store's (e.g., for store
+class C<MyStore>, that would be C<MyStore::Model::>). 
+
+    my $store = MyStore->new; 
+        # will import MyStore::Model::*
+    
+    my $store = MyStore->new( models => [ 'Foo::Bar', 'Something::Else' ] );
+        # imports specific classes
+        
+    my $store = MyStore->new( models => [ 'Foo::Bar', 'MyStore::Model::' ] );
+        # imports Foo::Bar and all classes under MyStore::Model::*
+
+=back
+
+=head2 model_names()
+
+Returns the name of all models known to the store.
+
+=head2 model_classes()
+
+Returns the full class name of all models known to the store.
+
+=head2 model_class( $name )
+
+Returns the full class name of the given model.
+
+=head2 new_model_object( $model_name, @args )
+
+Shortcut constructor for a model class of the store. Equivalent to
+
+    my $class = $store->model_class( $model_name );
+    my $thingy = $class->new( store_db => $store, @args );
+
+=head1 SEE ALSO
+
+* Original blog entry introducing the module: L<http://babyl.dyndns.org/techblog/entry/shaving-the-white-whale>
+
+=head2 Similar Modules
+
+* L<KiokuDB>
+
+* L<Elastic::Model>
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
 

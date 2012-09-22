@@ -18,7 +18,8 @@ has issue =>  (
     isa => 'Int',
 );
 
-has penciller => (
+has penciler => (
+    traits => [ 'StoreIndex' ],
     is => 'ro',
 );
 
