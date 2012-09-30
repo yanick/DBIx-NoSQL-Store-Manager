@@ -4,7 +4,7 @@ DBIx::NoSQL::Store::Manager - DBIx::NoSQL as a Moose object store
 
 # VERSION
 
-version 0.1.0
+version 0.1.1
 
 # SYNOPSIS
 

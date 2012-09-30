@@ -13,8 +13,7 @@ my %module_build_args = (
     "File::Temp" => 0,
     "Module::Build" => "0.3601",
     "Scalar::Util" => 0,
-    "Test::More" => "0.94",
-    "perl" => "5.004"
+    "Test::More" => "0.94"
   },
   "configure_requires" => {
     "Module::Build" => "0.3601"
@@ -24,7 +23,7 @@ my %module_build_args = (
     "Yanick Champoux <yanick\@babyl.dyndns.org>"
   ],
   "dist_name" => "DBIx-NoSQL-Store-Manager",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.1.1",
   "license" => "perl",
   "module_name" => "DBIx::NoSQL::Store::Manager",
   "recommends" => {},
@@ -38,6 +37,7 @@ my %module_build_args = (
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::ClassAttribute" => 0,
     "MooseX::Storage" => "0.31",
+    "perl" => "v5.10.0",
     "strict" => 0,
     "warnings" => 0
   },

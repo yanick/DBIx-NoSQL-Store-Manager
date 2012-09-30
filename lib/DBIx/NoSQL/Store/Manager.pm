@@ -3,7 +3,7 @@ BEGIN {
   $DBIx::NoSQL::Store::Manager::AUTHORITY = 'cpan:YANICK';
 }
 {
-  $DBIx::NoSQL::Store::Manager::VERSION = '0.1.0';
+  $DBIx::NoSQL::Store::Manager::VERSION = '0.1.1';
 }
 #ABSTRACT: DBIx::NoSQL as a Moose object store 
 
@@ -101,7 +101,7 @@ DBIx::NoSQL::Store::Manager - DBIx::NoSQL as a Moose object store
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.1
 
 =head1 SYNOPSIS
 
