@@ -1,6 +1,8 @@
 package DBIx::NoSQL::Store::Manager::Model;
 #ABSTRACT: Role for classes to be handled by DBIx::NoSQL::Store::Manager
 
+use 5.10.0;
+
 use strict;
 use warnings;
 
