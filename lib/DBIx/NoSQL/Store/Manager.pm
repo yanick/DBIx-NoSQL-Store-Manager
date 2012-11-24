@@ -121,6 +121,7 @@ method BUILD(@args) {
     }
 };
 
+=method new_object( $model_name, @args )
 =method new_model_object( $model_name, @args )
 
 Shortcut constructor for a model class of the store. Equivalent to
@@ -130,7 +131,9 @@ Shortcut constructor for a model class of the store. Equivalent to
 
 =cut
 
-method new_model_object ( $model, @args ) {
+method new_model_object(@args) { $self->new_object(@args) }
+
+method new_object ( $model, @args ) {
     $self->model_class($model)->new( store_db => $self, @args);   
 }
 
