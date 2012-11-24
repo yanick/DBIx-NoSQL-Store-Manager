@@ -1,2 +1,3 @@
 /DBIx-NoSQL-Store-Manager*
 .build
+t/db/comics.sqlite

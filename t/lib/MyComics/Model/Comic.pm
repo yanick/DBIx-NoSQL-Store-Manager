@@ -24,6 +24,7 @@ has penciler => (
 );
 
 has writer => (
+    traits => [ 'StoreIndex' ],
     is => 'ro',
 );
 

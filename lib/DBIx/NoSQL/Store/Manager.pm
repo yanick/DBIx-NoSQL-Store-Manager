@@ -114,9 +114,7 @@ method BUILD(@args) {
         my $model = $self->model( $p->store_model );
         
         $model->_wrap( sub {
-            my $inflated = $p->unpack($_[0]);
-            $inflated->store_db($self);
-            return $inflated;
+            $p->unpack($_[0], inject => { store_db => $self } );
         });
 
         $model->index(@$_) for $p->indexes;

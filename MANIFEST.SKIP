@@ -5,3 +5,4 @@ DBIx-NoSQL-Store-Manager.*
 ^\.git
 ^\.build
 
+t/db/comics.sqlite
