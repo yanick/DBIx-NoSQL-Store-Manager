@@ -1,6 +1,8 @@
 Revision history for DBIx-NoSQL-Store-Manager
 
 {{$NEXT}}
+
+0.2.0     2012-11-23
  [ENHANCEMENTS]
  - method 'create' as a shorter alias to 'new_model_object'
  - search() functionality now work
