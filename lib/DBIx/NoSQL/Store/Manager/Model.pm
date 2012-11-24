@@ -1,4 +1,10 @@
 package DBIx::NoSQL::Store::Manager::Model;
+BEGIN {
+  $DBIx::NoSQL::Store::Manager::Model::AUTHORITY = 'cpan:YANICK';
+}
+{
+  $DBIx::NoSQL::Store::Manager::Model::VERSION = '0.2.0';
+}
 #ABSTRACT: Role for classes to be handled by DBIx::NoSQL::Store::Manager
 
 use 5.10.0;
@@ -17,19 +23,7 @@ with 'DBIx::NoSQL::Store::Manager::StoreKey',
      'DBIx::NoSQL::Store::Manager::StoreIndex';
 
 
-=attr store_db
 
-The L<DBIx::NoSQL::Store::Manager> store to which the object belongs
-to. Required.
-
-=cut
-
-=method store_db
-
-Returns the L<DBIx::NoSQL::Store::Manager> store to which the object belongs
-to.
-
-=cut
 
 has store_db => (
     traits => [ 'DoNotSerialize' ],
@@ -37,21 +31,6 @@ has store_db => (
     required => 1,
 );
 
-=attr store_model
-
-Class-level attribute holding the model name of the class.
-If not given, defaults to the class name with everything up
-to a C<*::Model::> truncated (e.g., C<MyStore::Model::Thingy>
-would become C<Thingy>).
-
-Not that as it's a class-level attribute, it can't be passed to
-C<new()>, but has to be set via C<class_has>:
-
-    class_has +store_model => (
-        default => 'SomethingElse',
-    );
-
-=cut
 
 class_has store_model => (
     isa => 'Str',
@@ -65,12 +44,6 @@ class_has store_model => (
     },
 );
 
-=attr store_key
-
-The store id of the object. Defaults to the concatenation of the value of all
-attributes having the L<DBIx::NoSQL::Store::Manager::StoreKey> trait.
-
-=cut
 
 has store_key => (
     traits => [ 'DoNotSerialize' ],
@@ -86,11 +59,6 @@ has store_key => (
     },
 );
 
-=method store()
-
-Serializes the object into the store.
-
-=cut
 
 method store {
     $self->store_db->set( 
@@ -99,11 +67,6 @@ method store {
     );
 }
 
-=method delete()
-
-Deletes the object from the store.
-
-=cut
 
 method delete {
     $self->store_db->delete( $self->store_model => $self->store_key );
@@ -120,3 +83,126 @@ method indexes {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+DBIx::NoSQL::Store::Manager::Model - Role for classes to be handled by DBIx::NoSQL::Store::Manager
+
+=head1 VERSION
+
+version 0.2.0
+
+=head1 SYNOPSIS
+
+    package MyComics::Model::Comic;
+
+    use strict;
+    use warnings;
+
+    use Moose;
+
+    with 'DBIx::NoSQL::Store::Manager::Model';
+
+    has series => (
+        traits => [ 'StoreKey' ],
+        is => 'ro',
+    );
+
+    has issue =>  (
+        traits => [ 'StoreKey' ],
+        is => 'ro',
+        isa => 'Int',
+    );
+
+    has penciller => (
+        traits => [ 'StoreIndex' ],
+        is => 'ro',
+    );
+
+    has writer => (
+        is => 'ro',
+    );
+
+    __PACKAGE__->meta->make_immutable;
+
+    1;
+
+=head1 DESCRIPTION
+
+Role for classes to be stashed in a L<DBIx::NoSQL::Store::Manager> store.
+
+The only hard-requirement for a class consuming this role is to define a
+key to be used as the unique id of the object in the store. This can be done
+by applying the L<DBIx::NoSQL::Store::Manager::StoreIndex> trait to one or
+more attributes (the key will be the concatenation of those attributes). Or,
+if the generation of the key is more complicated, it can be done by playing
+with the C<store_key> attribute directly:
+
+    has '+store_key' => (
+        default => sub {
+            my $self = shift;
+
+            return $self->generate_arcane_key;
+        },
+    );
+
+Attributes of the class can be marked for indexed by giving them
+the L<DBIx::NoSQL::Store::Manager::StoreIndex> trait.
+
+=head1 ATTRIBUTES
+
+=head2 store_db
+
+The L<DBIx::NoSQL::Store::Manager> store to which the object belongs
+to. Required.
+
+=head2 store_model
+
+Class-level attribute holding the model name of the class.
+If not given, defaults to the class name with everything up
+to a C<*::Model::> truncated (e.g., C<MyStore::Model::Thingy>
+would become C<Thingy>).
+
+Not that as it's a class-level attribute, it can't be passed to
+C<new()>, but has to be set via C<class_has>:
+
+    class_has +store_model => (
+        default => 'SomethingElse',
+    );
+
+=head2 store_key
+
+The store id of the object. Defaults to the concatenation of the value of all
+attributes having the L<DBIx::NoSQL::Store::Manager::StoreKey> trait.
+
+=head1 METHODS
+
+=head2 store_db
+
+Returns the L<DBIx::NoSQL::Store::Manager> store to which the object belongs
+to.
+
+=head2 store()
+
+Serializes the object into the store.
+
+=head2 delete()
+
+Deletes the object from the store.
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
