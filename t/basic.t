@@ -20,7 +20,7 @@ unlink $db;   # to start fresh
 
 $store = MyComics->connect( $db );
 
-my $x = $store->new_model_object( 'Comic', 
+my $x = $store->create( 'Comic', 
     penciler => 'Yanick Paquette',
     writer => 'Alan Moore',
     issue => 2,
@@ -28,7 +28,7 @@ my $x = $store->new_model_object( 'Comic',
 )->store;
 
 
-$store->new_model_object( 'Comic', 
+$store->create( 'Comic', 
     penciler => 'Michel Lacombe',
     writer => 'Michel Lacombe',
     issue => 1,

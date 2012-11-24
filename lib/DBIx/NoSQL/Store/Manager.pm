@@ -23,6 +23,7 @@ Creates a new store manager.
 =over
 
 =item models => \@classes
+
 =item models => $class
 
 Classes to be imported as models for the store. Namespaces can also be given
@@ -121,7 +122,8 @@ method BUILD(@args) {
     }
 };
 
-=method new_object( $model_name, @args )
+=method create( $model_name, @args )
+
 =method new_model_object( $model_name, @args )
 
 Shortcut constructor for a model class of the store. Equivalent to
@@ -131,9 +133,9 @@ Shortcut constructor for a model class of the store. Equivalent to
 
 =cut
 
-method new_model_object(@args) { $self->new_object(@args) }
+method new_model_object(@args) { $self->create(@args) }
 
-method new_object ( $model, @args ) {
+method create ( $model, @args ) {
     $self->model_class($model)->new( store_db => $self, @args);   
 }
 
