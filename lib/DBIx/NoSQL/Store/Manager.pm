@@ -115,7 +115,9 @@ method BUILD(@args) {
         my $model = $self->model( $p->store_model );
         
         $model->_wrap( sub {
-            $p->unpack($_[0], inject => { store_db => $self } );
+            my $ref = shift;
+            $ref = $ref->[0] if ref($ref) eq 'ARRAY';
+            $p->unpack($ref, inject => { store_db => $self } );
         });
 
         $model->index(@$_) for $p->indexes;

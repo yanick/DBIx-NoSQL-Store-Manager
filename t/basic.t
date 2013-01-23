@@ -8,7 +8,7 @@ use File::Temp qw/ tempdir /;
 
 use MyComics;
 
-plan tests => 6;
+plan tests => 7;
 
 my $store = MyComics->new;
 
@@ -51,4 +51,13 @@ subtest 'search' => sub {
     is @comics => 1, 'OBY';
 
     is $comics[0]->series => 'One Bloody Year', 'right one';
+};
+
+subtest 'next' => sub {
+    plan tests => 2;
+    my $rs = $store->search('Comic');
+
+    while( my $e = $rs->next ) {
+        pass $e->writer;
+    }
 };
