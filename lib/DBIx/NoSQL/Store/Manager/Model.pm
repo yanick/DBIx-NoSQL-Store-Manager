@@ -61,6 +61,7 @@ class_has store_model => (
        my( $class ) = $self->class_precedence_list;
 
        $class =~ s/^.*::Model:://;
+       $class =~ s/::/_/g;
        return $class;
     },
 );
