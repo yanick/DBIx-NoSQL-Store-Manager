@@ -1,20 +1,13 @@
 Revision history for DBIx-NoSQL-Store-Manager
 
-{{$NEXT}}
- [API CHANGES]
-
+0.2.1 2013-01-24
  [BUG FIXES]
  - ensure class names are db-friendly (replace '::' by '_')
  - fix calls to next()
  - Make the building of the store a bit more sane.
 
- [DOCUMENTATION]
-
- [ENHANCEMENTS]
-
- [NEW FEATURES]
-
  [STATISTICS]
+ - code churn: 6 files changed, 74 insertions(+), 32 deletions(-)
 
 0.2.0 2012-11-23
  [ENHANCEMENTS]
