@@ -1,6 +1,8 @@
 Revision history for DBIx-NoSQL-Store-Manager
 
 {{$NEXT}}
+
+0.2.1     2013-01-24
  [API CHANGES]
 
  [BUG FIXES]
