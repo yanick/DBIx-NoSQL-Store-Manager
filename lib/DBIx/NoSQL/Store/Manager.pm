@@ -8,7 +8,7 @@ use Moose;
 
 use Moose::Util::TypeConstraints;
 
-use DBIx::NoSQL::Store;
+use DBIx::NoSQL 0.0020;
 use Method::Signatures;
 use Module::Pluggable require => 1;
 
