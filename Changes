@@ -2,6 +2,10 @@ Revision history for DBIx-NoSQL-Store-Manager
 
 {{$NEXT}}
 
+ [BUG FIXES]
+ - multi-field keys are now always joined in the same order.
+
+
 0.2.2     2013-01-30
  [API CHANGES]
 
