@@ -78,9 +78,8 @@ has store_key => (
     is => 'ro',
     lazy => 1,
     default => method {
-       return join( '-', map {
-        my $m = $_->get_read_method;
-        $self->$m;
+       return join( '-', map { $self->$_ } sort map {
+        $_->get_read_method
        } grep { $_->does('DBIx::NoSQL::Store::Manager::StoreKey') }
          $self->meta->get_all_attributes )
          // die "no store key set for $self";
