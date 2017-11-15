@@ -5,6 +5,10 @@ Revision history for DBIx-NoSQL-Store-Manager
  [BUG FIXES]
  - multi-field keys are now always joined in the same order.
 
+ [MISC]
+ - Remove dependency to Method::Signatures; use core signatures instead.
+    (GH#6)
+
 
 0.2.2     2013-01-30
  [API CHANGES]

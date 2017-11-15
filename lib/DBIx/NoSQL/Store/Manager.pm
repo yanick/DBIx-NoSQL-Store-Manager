@@ -1,18 +1,22 @@
 package DBIx::NoSQL::Store::Manager;
 #ABSTRACT: DBIx::NoSQL as a Moose object store 
 
+use 5.20.0;
+
 use strict;
 use warnings;
 
 use Moose;
 
+# TODO  type tiny
 use Moose::Util::TypeConstraints;
 
 use DBIx::NoSQL 0.0020;
-use Method::Signatures;
 use Module::Pluggable require => 1;
 
 extends 'DBIx::NoSQL::Store';
+
+use experimental 'signatures';
 
 =method new( models => \@classes )
 
@@ -59,7 +63,7 @@ has models => (
     traits => [ 'Array' ],
     is => 'ro',
     isa => 'Model',
-    default => method {
+    default => sub($self) {
         [ join "::", ($self->meta->class_precedence_list)[0], 'Model', '' ];
     },
     handles => {
@@ -93,7 +97,7 @@ has _models => (
     },
 );
 
-method _register_models( @models ) {
+sub _register_models( $self, @models ) {
     # expand namespaces into their plugins
     @models = map { 
         s/::$// ? do {
@@ -119,7 +123,7 @@ method _register_models( @models ) {
     }
 }
 
-method BUILD($args) {
+sub BUILD($self,$args) {
     $args->{models} ||= [ 
         join "::", ($self->meta->class_precedence_list)[0], 'Model', '' 
     ];
@@ -138,9 +142,9 @@ Shortcut constructor for a model class of the store. Equivalent to
 
 =cut
 
-method new_model_object(@args) { $self->create(@args) }
+sub new_model_object($self,@args) { $self->create(@args) }
 
-method create ( $model, @args ) {
+sub create ( $self,  $model, @args ) {
     $self->model_class($model)->new( store_db => $self, @args);   
 }
 
