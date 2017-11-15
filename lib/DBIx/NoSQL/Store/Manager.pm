@@ -148,5 +148,18 @@ sub create ( $self,  $model, @args ) {
     $self->model_class($model)->new( store_db => $self, @args);   
 }
 
+# $store->set( $model, $key, $hashref )
+# $store->set( $object )  
+around set => sub($orig,$self,@rest) {
+
+    if( @rest == 1 ) {  # object call
+        my $object = shift @rest;
+        $object->store_db($self) unless $object->has_store_db;
+        
+        return $orig->( $self, map { $object->$_ } qw/ store_model store_key pack / ); 
+    }
+    $orig->($self, @rest );
+};
+
 1;
 
