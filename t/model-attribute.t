@@ -3,8 +3,10 @@ use warnings;
 
 use lib 't/lib';
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Deep;
+
+use Log::Any::Adapter ('Stderr', log_level => 'trace' );
 
 use Blog;
 
@@ -71,5 +73,31 @@ subtest 'cascade_delete' => sub {
     ok !$store->get( 'Entry2' => '/third' ), "entry is gone";
 
     ok !$store->get( 'Author' => 'charles' ), "...and author is gone";
+
+};
+
+subtest 'delete previous version' => sub {
+    my $author = $store->create( Author => ( name => 'david' ) );
+
+    my $entry = $store->create( Entry2 => (
+        url => '/dpv', author => $author 
+    )  );
+
+    ok $store->get( 'Author' => 'david' ), "david is there";
+
+    $entry->author(
+        Blog::Model::Author->new( name => 'Eleonor' )
+    );
+
+    ok $store->get( 'Author' => 'david' ), "david is still there";
+    ok !$store->get( 'Author' => 'Eleonor' ), "Eleonor not saved yet";
+
+    $entry->save;
+
+    ok !$store->get( 'Author' => 'david' ), "david is gone";
+    ok $store->get( 'Author' => 'Eleonor' ), "Eleonor not saved";
+
+    is $entry->author->name => 'Eleonor', "Eleonor is the author";
+
 
 };

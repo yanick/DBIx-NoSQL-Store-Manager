@@ -42,8 +42,50 @@ C<$model_class|Str>.
 Sets the default of C<cascade_save> and C<cascade_delete>.
 Defaults to C<false>.
 
+=head2 cascade_save => $boolean
+
+If C<true> the object associated with the attribute is automatically saved 
+to the store when the main object is C<save()>d.
+
+=head2 cascade_delete => $boolean
+
+If C<true>, deletes the attribute object (if there is any)
+from the store when the main object is C<delete()>d.
+
+If both C<cascade_delete> and C<cascade_save> are C<true>,
+then when saving the main object, if the attribute object has been
+modified, its previous value will be deleted from the store.
+
+    # assuming the author attribute has `cascade_model => 1`...
+
+    my $blog_entry = $store->create( 'Entry', 
+        author => Blog::Model::Author->new( 
+            name => 'yanick',
+            bio  => 'necrohacker',
+        ),
+    );
+
+    # store now has yanick as an author
+
+    my $pseudonym = $store->create( Author => 
+        name => 'yenzie', bio => 'neo-necrohacker' 
+    );
+
+    # store has both 'yanick' and 'yenzie'
+
+    # does not modify the store
+    $blog_entry->author( $pseudonym );
+
+    # removes 'yanick'
+    $blog_entry->save;
+
+
+    
+
 
 =cut
+
+use Log::Any qw/ $log /;
 
 use Moose::Role;
 Moose::Util::meta_attribute_alias('StoreModel');
@@ -60,18 +102,20 @@ has store_model => (
 has cascade_model => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 0,
+    default => sub { 0 },
 );
 
 has cascade_save => (
     is      => 'ro',
     isa     => 'Bool',
+    lazy => 1,
     default => sub { $_[0]->cascade_model },
 );
 
 has cascade_delete => (
     is      => 'ro',
     isa     => 'Bool',
+    lazy => 1,
     default => sub { $_[0]->cascade_model },
 );
 
@@ -115,17 +159,35 @@ after install_accessors => sub {
     } );
 
     if( $attr->cascade_save ) {
-        $attr->associated_class->add_after_method_modifier( 'save' => sub ( $self, $store=undef ) {
+        $attr->associated_class->add_before_method_modifier( 'save' => sub ( $self, $store=undef ) {
+                my $value = $self->$reader or return;
+                
+                if ( $attr->cascade_delete ) {
+                    my $prior = eval { $self->store_db->get( $self->store_model, $self->store_key )->$reader };
 
-            my $value = $self->$reader or return;
+                    if ( $prior ) { 
+                        $log->trace( "deleting prior attribute", {
+                            main_object => [ $self->store_model, $self->store_key ],
+                            attribute => [ $attr->name, $prior->store_key ],
+                        }
+                        );
+                        $prior->delete;
+                    }
+                }
 
-            $store ||= $self->store_db;
+                $log->trace(
+                    "saving attribute", {
+                        main_object => [ $self->store_model, $self->store_key ],
+                        attribute => [ $attr->name, $value->store_key ],
+                    }
+                );
 
-            $value->store_db( $store );
 
-            # TODO check if the store_db of $self and attribute match
+                $store ||= $self->store_db;
 
-            $value->save;
+                $value->store_db( $store );
+
+                $value->save;
         });
     }
 };
