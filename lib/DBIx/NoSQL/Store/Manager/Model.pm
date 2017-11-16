@@ -12,6 +12,8 @@ use MooseX::ClassAttribute;
 use MooseX::Storage 0.31;
 use MooseX::SetOnce;
 
+use Scalar::Util qw/ refaddr /;
+
 with Storage;
 with 'DBIx::NoSQL::Store::Manager::StoreKey',
      'DBIx::NoSQL::Store::Manager::StoreIndex';
@@ -39,6 +41,14 @@ has store_db => (
     is       => 'rw',
     predicate =>  'has_store_db',
 );
+
+around store_db => sub ( $orig, $self, @rest ) {
+    if ( @rest and $self->has_store_db ) {
+        shift @rest if refaddr $self->store_db == refaddr $rest[0];
+    }
+
+    return $orig->($self,@rest);
+};
 
 =attr store_model
 
