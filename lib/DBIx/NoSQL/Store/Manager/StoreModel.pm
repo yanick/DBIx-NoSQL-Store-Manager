@@ -37,8 +37,10 @@ Required. Takes in the model associated with the target attribute.
 Will automatically populate the C<isa> attribute to 
 C<$model_class|Str>.
 
+=head2 cascade_model => $boolean
 
-
+Sets the default of C<cascade_save> and C<cascade_delete>.
+Defaults to C<false>.
 
 
 =cut
@@ -55,16 +57,22 @@ has store_model => (
     predicate => 'has_store_model',
 );
 
-has cascade_save => (
+has cascade_model => (
     is      => 'ro',
     isa     => 'Bool',
     default => 0,
 );
 
+has cascade_save => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => sub { $_[0]->cascade_model },
+);
+
 has cascade_delete => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 0,
+    default => sub { $_[0]->cascade_model },
 );
 
 before _process_options => sub ( $meta, $name, $options ) {
