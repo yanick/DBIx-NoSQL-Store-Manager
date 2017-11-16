@@ -3,10 +3,10 @@ use warnings;
 
 use lib 't/lib';
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Deep;
 
-use Log::Any::Adapter ('Stderr', log_level => 'trace' );
+#use Log::Any::Adapter ('Stderr', log_level => 'trace' );
 
 use Blog;
 
@@ -98,6 +98,18 @@ subtest 'delete previous version' => sub {
     ok $store->get( 'Author' => 'Eleonor' ), "Eleonor not saved";
 
     is $entry->author->name => 'Eleonor', "Eleonor is the author";
+};
 
+subtest 'attribute as hashref' => sub {
+    my $entry = $store->create( 'Entry2' => (
+        url => '/attribute_as_hashref',
+        author => {
+            name => 'Freya',
+            bio  => 'are you a Freya of the dark?',
+        },
+    ));
+
+    like $entry->author->bio => qr/dark/, "expanded as object";
+    like $store->get( 'Author' => 'Freya' )->bio => qr/dark/, "expanded as object";
 
 };

@@ -19,12 +19,22 @@ I<DBIx::NoSQL::Store::Manager::StoreModel> (also aliased to I<StoreModel>)
 
 This trait ties the value of the attribute to a model of the store.
 
-The value of the attribute can be set via either a model object, or via 
+The value of the attribute can be set via either a model object, a hashref, or 
 the store key of an object already existing in the store. The getter always
 returns the inflated model object.
 
     my $blog_entry = $store->create( 'Entry', 
         author => 'yanick',
+    );
+
+    # or
+    $blog_entry = $store->create( 'Entry', 
+        author => Blog::Model::Author->new( name => 'yanick' )
+    );
+
+    # or
+    $blog_entry = $store->create( 'Entry', 
+        author => { name => 'yanick' }
     );
 
     my $author_object = $blog_entry->author; # will be a Blog::Model::Author object
@@ -35,7 +45,7 @@ returns the inflated model object.
 
 Required. Takes in the model associated with the target attribute.
 Will automatically populate the C<isa> attribute to 
-C<$model_class|Str>.
+C<$model_class|Str_HashRef>.
 
 =head2 cascade_model => $boolean
 
@@ -88,6 +98,8 @@ modified, its previous value will be deleted from the store.
 use Log::Any qw/ $log /;
 
 use Moose::Role;
+use Scalar::Util qw/ blessed /;
+
 Moose::Util::meta_attribute_alias('StoreModel');
 
 use experimental 'signatures';
@@ -119,8 +131,11 @@ has cascade_delete => (
     default => sub { $_[0]->cascade_model },
 );
 
+use Types::Standard qw/ InstanceOf Str HashRef/;
+
 before _process_options => sub ( $meta, $name, $options ) {
-    $options->{isa} ||= $options->{store_model}.'|Str';
+    my $type = InstanceOf[ $options->{store_model } ] | Str | HashRef;
+    $options->{isa} ||= $type;
 };
 
 after install_accessors => sub { 
@@ -139,16 +154,22 @@ after install_accessors => sub {
         return if @rest;
 
         my $value = $attr->get_value( $self );
-        return unless defined $value and not ref $value;
+        return unless defined $value and not blessed $value;
 
+        if ( ref $value ) { 
+            $attr->set_raw_value( $self, 
+                $attr->store_model->new($value)
+            );
+        }
+        else {  # it's the store key
+            my $class = $attr->store_model;
+            $class =~ s/^.*::Model:://;
+            $class =~ s/::/_/g;
 
-        my $class = $attr->store_model;
-        $class =~ s/^.*::Model:://;
-        $class =~ s/::/_/g;
-
-        $attr->set_raw_value( $self, 
-            $self->store_db->get( $class => $value )
-        );
+            $attr->set_raw_value( $self, 
+                $self->store_db->get( $class => $value )
+            );
+        }
     });
 
     $main_class->add_around_method_modifier( pack => sub($orig,$self) {
