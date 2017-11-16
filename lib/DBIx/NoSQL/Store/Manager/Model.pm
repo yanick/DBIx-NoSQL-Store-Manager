@@ -15,8 +15,10 @@ use MooseX::SetOnce;
 use Scalar::Util qw/ refaddr /;
 
 with Storage;
-with 'DBIx::NoSQL::Store::Manager::StoreKey',
-     'DBIx::NoSQL::Store::Manager::StoreIndex';
+
+use DBIx::NoSQL::Store::Manager::StoreKey;
+use DBIx::NoSQL::Store::Manager::StoreIndex;
+use DBIx::NoSQL::Store::Manager::StoreModel;
 
 use experimental 'signatures';
 
