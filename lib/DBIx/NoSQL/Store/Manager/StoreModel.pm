@@ -127,13 +127,15 @@ after install_accessors => sub {
     my $attr = shift;
 
     my $reader = $attr->get_read_method;
+    # class that has the attribute
+    my $main_class = $attr->associated_class;
 
-    $attr->associated_class->add_before_method_modifier( delete => sub ( $self, @) {
+    $main_class->add_before_method_modifier( delete => sub ( $self, @) {
         my $obj = $self->$reader or return;
         $obj->delete;
     }) if $attr->cascade_delete;
 
-    $attr->associated_class->add_before_method_modifier( $attr->get_read_method => sub ( $self, @rest ) {
+    $main_class->add_before_method_modifier( $attr->get_read_method => sub ( $self, @rest ) {
         return if @rest;
 
         my $value = $attr->get_value( $self );
@@ -149,7 +151,7 @@ after install_accessors => sub {
         );
     });
 
-    $attr->associated_class->add_around_method_modifier( pack => sub($orig,$self) {
+    $main_class->add_around_method_modifier( pack => sub($orig,$self) {
             my $packed = $orig->($self);
             my $val = $attr->get_read_method_ref->($self);
             if ( $val ) {
@@ -159,7 +161,7 @@ after install_accessors => sub {
     } );
 
     if( $attr->cascade_save ) {
-        $attr->associated_class->add_before_method_modifier( 'save' => sub ( $self, $store=undef ) {
+        $main_class->add_before_method_modifier( 'save' => sub ( $self, $store=undef ) {
                 my $value = $self->$reader or return;
                 
                 if ( $attr->cascade_delete ) {
