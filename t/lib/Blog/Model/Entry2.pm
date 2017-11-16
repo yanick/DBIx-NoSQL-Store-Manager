@@ -15,6 +15,7 @@ class_has '+store_model' => (
 has '+author' => (
     traits => [ 'StoreModel' ],
     cascade_save => 1,
+    cascade_delete => 1,
 );
 
 

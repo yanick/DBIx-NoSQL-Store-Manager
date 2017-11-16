@@ -45,3 +45,31 @@ subtest 'cascade_save' => sub {
 };
 
 
+subtest 'cascade_delete' => sub {
+    my $author = $store->create( Author => ( name => 'charles', bio => 'foo' ) );
+
+    my $entry = $store->create( Entry => (
+        url => '/third', author => $author 
+    )  );
+
+    ok $store->get( 'Entry' => '/third' ), "entry is there";
+
+    $entry->delete;
+
+    ok !$store->get( 'Entry' => '/third' ), "entry is gone";
+
+    ok $store->get( 'Author' => 'charles' ), "... but author lives on";
+
+    $entry = $store->create( Entry2 => (
+        url => '/third', author => $author 
+    )  );
+
+    ok $store->get( 'Entry2' => '/third' ), "entry is there";
+
+    $entry->delete;
+
+    ok !$store->get( 'Entry2' => '/third' ), "entry is gone";
+
+    ok !$store->get( 'Author' => 'charles' ), "...and author is gone";
+
+};

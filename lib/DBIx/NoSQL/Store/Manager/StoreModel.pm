@@ -61,6 +61,12 @@ has cascade_save => (
     default => 0,
 );
 
+has cascade_delete => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,
+);
+
 before _process_options => sub ( $meta, $name, $options ) {
     $options->{isa} ||= $options->{store_model}.'|Str';
 };
@@ -69,6 +75,11 @@ after install_accessors => sub {
     my $attr = shift;
 
     my $reader = $attr->get_read_method;
+
+    $attr->associated_class->add_before_method_modifier( delete => sub ( $self, @) {
+        my $obj = $self->$reader or return;
+        $obj->delete;
+    }) if $attr->cascade_delete;
 
     $attr->associated_class->add_before_method_modifier( $attr->get_read_method => sub ( $self, @rest ) {
         return if @rest;
