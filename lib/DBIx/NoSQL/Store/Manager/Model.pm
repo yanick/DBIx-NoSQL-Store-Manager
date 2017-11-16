@@ -49,7 +49,7 @@ would become C<Thingy>).
 Not that as it's a class-level attribute, it can't be passed to
 C<new()>, but has to be set via C<class_has>:
 
-    class_has +store_model => (
+    class_has '+store_model' => (
         default => 'SomethingElse',
     );
 
