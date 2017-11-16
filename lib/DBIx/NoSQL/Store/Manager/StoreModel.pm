@@ -3,17 +3,43 @@ package DBIx::NoSQL::Store::Manager::StoreModel;
 
 =head1 SYNOPSIS
 
-    # in a class consuming the DBIx::NoSQL::Store::Manager::Model role
+    package Blog::Model::Entry;
 
-    has something => (
+    has author => (
         traits => [ 'StoreModel' ],
-        store_model =>  'MyStore::Model::Thingy',
+        store_model =>  'Blog::Model::Author',
+        cascade_save => 1,
+        cascade_delete => 0,
         is => 'rw',
     );
 
 =head1 DESCRIPTION
 
 I<DBIx::NoSQL::Store::Manager::StoreModel> (also aliased to I<StoreModel>)
+
+This trait ties the value of the attribute to a model of the store.
+
+The value of the attribute can be set via either a model object, or via 
+the store key of an object already existing in the store. The getter always
+returns the inflated model object.
+
+    my $blog_entry = $store->create( 'Entry', 
+        author => 'yanick',
+    );
+
+    my $author_object = $blog_entry->author; # will be a Blog::Model::Author object
+
+=head1 ATTRIBUTES
+
+=head2 store_model => $model_class
+
+Required. Takes in the model associated with the target attribute.
+Will automatically populate the C<isa> attribute to 
+C<$model_class|Str>.
+
+
+
+
 
 =cut
 
@@ -25,6 +51,7 @@ use experimental 'signatures';
 has store_model => (
     is => 'ro',
     isa => 'Str',
+    required => 1,
     predicate => 'has_store_model',
 );
 
