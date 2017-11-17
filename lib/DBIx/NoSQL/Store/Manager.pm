@@ -131,7 +131,6 @@ sub BUILD($self,$args) {
     $self->_register_models( @{ $args->{models} } );
 };
 
-=method create( $model_name, @args )
 
 =method new_model_object( $model_name, @args )
 
@@ -142,10 +141,24 @@ Shortcut constructor for a model class of the store. Equivalent to
 
 =cut
 
-sub new_model_object($self,@args) { $self->create(@args) }
+sub new_model_object($self,$model,@args) { 
+    $self->model_class($model)->new( store_db => $self, @args);   
+}
+
+=method create( $model, @args )
+
+Create a new model object and save it. Morally equivalent to
+
+    $store->new_model_object( $model, @args )->save;
+
+Returns the new object.
+
+=cut
 
 sub create ( $self,  $model, @args ) {
-    $self->model_class($model)->new( store_db => $self, @args);   
+    my $object = $self->new_model_object( $model => @args );
+    $object->save;
+    return $object;
 }
 
 # $store->set( $model, $key, $hashref )

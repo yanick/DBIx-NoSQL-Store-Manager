@@ -1,6 +1,8 @@
 Revision history for DBIx-NoSQL-Store-Manager
 
 {{$NEXT}}
+ [API CHANGES]
+ - 'create()' now saves the new object in the store  upon creation.
 
  [IMPROVEMENTS]
  - $store->set($object) figures out which model to use based on the object's
