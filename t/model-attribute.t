@@ -3,10 +3,8 @@ use warnings;
 
 use lib 't/lib';
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Deep;
-
-#use Log::Any::Adapter ('Stderr', log_level => 'trace' );
 
 use Blog;
 
@@ -117,7 +115,7 @@ subtest 'attribute as hashref' => sub {
 subtest 'array of models' => sub {
     my $entry = $store->create( Entry2 => (
             url => 'array of models',
-            tags => [ 'foo', 'bar' ],
+            tags => [ { tag => 'foo' }, { tag => 'bar' } ],
     ));
 
     my @tags = $store->search( 'Tag' )->all;
