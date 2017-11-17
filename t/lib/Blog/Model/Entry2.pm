@@ -20,8 +20,13 @@ has author => (
     is     => 'rw',
 );
 
-
-
+has tags => (
+    traits => [ 'Array', 'StoreModel' ],
+    cascade_save => 1,
+    store_model => 'Blog::Model::Tag',
+    is     => 'ro',
+    default => sub { [] },
+);
 
 __PACKAGE__->meta->make_immutable;
 

@@ -113,3 +113,16 @@ subtest 'attribute as hashref' => sub {
     like $store->get( 'Author' => 'Freya' )->bio => qr/dark/, "expanded as object";
 
 };
+
+subtest 'array of models' => sub {
+    my $entry = $store->create( Entry2 => (
+            url => 'array of models',
+            tags => [ 'foo', 'bar' ],
+    ));
+
+    my @tags = $store->search( 'Tag' )->all;
+    is scalar(@tags) => 2, '2 tags';
+
+    is_deeply [ sort map { $_->tag } @tags ], [ qw/ bar foo / ], "right tags";
+
+};
