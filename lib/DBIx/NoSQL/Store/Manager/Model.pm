@@ -10,6 +10,9 @@ use Moose::Role;
 
 use MooseX::ClassAttribute;
 use MooseX::Storage 0.31;
+use MooseX::SetOnce;
+
+use Scalar::Util qw/ refaddr /;
 
 with Storage;
 with 'DBIx::NoSQL::Store::Manager::StoreKey',
@@ -22,7 +25,7 @@ use experimental 'signatures';
 =attr store_db
 
 The L<DBIx::NoSQL::Store::Manager> store to which the object belongs
-to. Required.
+to. 
 
 =cut
 
@@ -34,10 +37,18 @@ to.
 =cut
 
 has store_db => (
-    traits => [ 'DoNotSerialize' ],
-    is       => 'ro',
-    required => 1,
+    traits => [ 'DoNotSerialize', 'SetOnce' ],
+    is       => 'rw',
+    predicate =>  'has_store_db',
 );
+
+around store_db => sub ( $orig, $self, @rest ) {
+    if ( @rest and $self->has_store_db ) {
+        shift @rest if refaddr $self->store_db == refaddr $rest[0];
+    }
+
+    return $orig->($self,@rest);
+};
 
 =attr store_model
 
@@ -80,6 +91,7 @@ has store_key => (
     is => 'ro',
     lazy => 1,
     default => sub($self) {
+        no warnings 'uninitialized';
        return join( '-', map { $self->$_ } sort map {
         $_->get_read_method
        } grep { $_->does('DBIx::NoSQL::Store::Manager::StoreKey') }
@@ -90,15 +102,15 @@ has store_key => (
 
 =method store()
 
-Serializes the object into the store.
+DEPRECATED - use C<save()> instead.
+
+Serializes the object into the store. 
 
 =cut
 
 sub store($self) {
-    $self->store_db->set( 
-        $self->store_model =>
-            $self->store_key => $self,
-    );
+    # TODO put deprecation notice
+    $self->save;
 }
 
 =method delete()
@@ -119,6 +131,20 @@ sub indexes($self) {
     return map  { [ $_->name, ( isa => $_->store_isa ) x $_->has_store_isa ] }
            grep { $_->does('DBIx::NoSQL::Store::Manager::StoreIndex') } 
                 $self->meta->get_all_attributes;
+}
+
+=method save( $store )
+
+Saves the object in the store. The C<$store> object can be given as an argument if 
+the object was not created via a master C<DBIx::NoSQL::Store::Manager> object
+and C<store_db> was not already provided via the constructor.
+
+=cut
+
+sub save($self,$store=undef) {
+    $self->store_db( $store ) if $store;
+
+    $self->store_db->set($self);
 }
 
 1;
