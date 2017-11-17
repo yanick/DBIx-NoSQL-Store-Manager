@@ -8,6 +8,7 @@ Revision history for DBIx-NoSQL-Store-Manager
  [MISC]
  - Remove dependency to Method::Signatures; use core signatures instead.
     (GH#6)
+ - documentation fixes.
 
 
 0.2.2     2013-01-30
