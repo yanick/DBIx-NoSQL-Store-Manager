@@ -2,6 +2,10 @@ Revision history for DBIx-NoSQL-Store-Manager
 
 {{$NEXT}}
 
+ [IMPROVEMENTS]
+ - $store->set($object) figures out which model to use based on the object's
+   class.
+
  [BUG FIXES]
  - multi-field keys are now always joined in the same order.
 
