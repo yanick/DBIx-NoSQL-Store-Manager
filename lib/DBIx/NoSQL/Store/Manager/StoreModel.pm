@@ -134,7 +134,7 @@ has cascade_delete => (
     default => sub { $_[0]->cascade_model },
 );
 
-use Types::Standard qw/ InstanceOf Str HashRef ArrayRef/;
+use Types::Standard qw/ InstanceOf Str HashRef ArrayRef ConsumerOf /;
 
 before _process_options => sub ( $meta, $name, $options ) {
     my $type = InstanceOf[ $options->{store_model } ] | Str | HashRef;
@@ -142,6 +142,7 @@ before _process_options => sub ( $meta, $name, $options ) {
         $type = 'ArrayRef';
     }
     $options->{isa} ||= $type;
+    push @{ $options->{traits} }, 'DoNotSerialize';
 };
 
 use experimental 'postderef';
