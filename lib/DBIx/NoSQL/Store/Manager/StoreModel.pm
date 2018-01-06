@@ -1,102 +1,7 @@
 package DBIx::NoSQL::Store::Manager::StoreModel;
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: trait for attributes linking to store objects.
-
-=head1 SYNOPSIS
-
-    package Blog::Model::Entry;
-
-    has author => (
-        traits => [ 'StoreModel' ],
-        store_model =>  'Blog::Model::Author',
-        cascade_save => 1,
-        cascade_delete => 0,
-        is => 'rw',
-    );
-
-=head1 DESCRIPTION
-
-I<DBIx::NoSQL::Store::Manager::StoreModel> (also aliased to I<StoreModel>)
-
-This trait ties the value of the attribute to a model of the store.
-
-The value of the attribute can be set via either a model object, a hashref, or 
-the store key of an object already existing in the store. The getter always
-returns the inflated model object.
-
-    my $blog_entry = $store->create( 'Entry', 
-        author => 'yanick',
-    );
-
-    # or
-    $blog_entry = $store->create( 'Entry', 
-        author => Blog::Model::Author->new( name => 'yanick' )
-    );
-
-    # or
-    $blog_entry = $store->create( 'Entry', 
-        author => { name => 'yanick' }
-    );
-
-    my $author_object = $blog_entry->author; # will be a Blog::Model::Author object
-
-If the C<Array> trait is also applied to the attribute, the attribute is assumed to contain
-a collection of objects. The same logic applies as above, only wrapped in an arrayref.
-
-=head1 ATTRIBUTES
-
-=head2 store_model => $model_class
-
-Required. Takes in the model associated with the target attribute.
-Will automatically populate the C<isa> attribute to 
-C<$model_class|Str_HashRef>.
-
-=head2 cascade_model => $boolean
-
-Sets the default of C<cascade_save> and C<cascade_delete>.
-Defaults to C<false>.
-
-=head2 cascade_save => $boolean
-
-If C<true> the object associated with the attribute is automatically saved 
-to the store when the main object is C<save()>d.
-
-=head2 cascade_delete => $boolean
-
-If C<true>, deletes the attribute object (if there is any)
-from the store when the main object is C<delete()>d.
-
-If both C<cascade_delete> and C<cascade_save> are C<true>,
-then when saving the main object, if the attribute object has been
-modified, its previous value will be deleted from the store.
-
-    # assuming the author attribute has `cascade_model => 1`...
-
-    my $blog_entry = $store->create( 'Entry', 
-        author => Blog::Model::Author->new( 
-            name => 'yanick',
-            bio  => 'necrohacker',
-        ),
-    );
-
-    # store now has yanick as an author
-
-    my $pseudonym = $store->create( Author => 
-        name => 'yenzie', bio => 'neo-necrohacker' 
-    );
-
-    # store has both 'yanick' and 'yenzie'
-
-    # does not modify the store
-    $blog_entry->author( $pseudonym );
-
-    # removes 'yanick'
-    $blog_entry->save;
-
-
-    
-
-
-=cut
+$DBIx::NoSQL::Store::Manager::StoreModel::VERSION = '1.0.0';
 
 use Log::Any qw/ $log /;
 
@@ -234,3 +139,121 @@ after install_accessors => sub {
 
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::NoSQL::Store::Manager::StoreModel - trait for attributes linking to store objects.
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 SYNOPSIS
+
+    package Blog::Model::Entry;
+
+    has author => (
+        traits => [ 'StoreModel' ],
+        store_model =>  'Blog::Model::Author',
+        cascade_save => 1,
+        cascade_delete => 0,
+        is => 'rw',
+    );
+
+=head1 DESCRIPTION
+
+I<DBIx::NoSQL::Store::Manager::StoreModel> (also aliased to I<StoreModel>)
+
+This trait ties the value of the attribute to a model of the store.
+
+The value of the attribute can be set via either a model object, a hashref, or 
+the store key of an object already existing in the store. The getter always
+returns the inflated model object.
+
+    my $blog_entry = $store->create( 'Entry', 
+        author => 'yanick',
+    );
+
+    # or
+    $blog_entry = $store->create( 'Entry', 
+        author => Blog::Model::Author->new( name => 'yanick' )
+    );
+
+    # or
+    $blog_entry = $store->create( 'Entry', 
+        author => { name => 'yanick' }
+    );
+
+    my $author_object = $blog_entry->author; # will be a Blog::Model::Author object
+
+If the C<Array> trait is also applied to the attribute, the attribute is assumed to contain
+a collection of objects. The same logic applies as above, only wrapped in an arrayref.
+
+=head1 ATTRIBUTES
+
+=head2 store_model => $model_class
+
+Required. Takes in the model associated with the target attribute.
+Will automatically populate the C<isa> attribute to 
+C<$model_class|Str_HashRef>.
+
+=head2 cascade_model => $boolean
+
+Sets the default of C<cascade_save> and C<cascade_delete>.
+Defaults to C<false>.
+
+=head2 cascade_save => $boolean
+
+If C<true> the object associated with the attribute is automatically saved 
+to the store when the main object is C<save()>d.
+
+=head2 cascade_delete => $boolean
+
+If C<true>, deletes the attribute object (if there is any)
+from the store when the main object is C<delete()>d.
+
+If both C<cascade_delete> and C<cascade_save> are C<true>,
+then when saving the main object, if the attribute object has been
+modified, its previous value will be deleted from the store.
+
+    # assuming the author attribute has `cascade_model => 1`...
+
+    my $blog_entry = $store->create( 'Entry', 
+        author => Blog::Model::Author->new( 
+            name => 'yanick',
+            bio  => 'necrohacker',
+        ),
+    );
+
+    # store now has yanick as an author
+
+    my $pseudonym = $store->create( Author => 
+        name => 'yenzie', bio => 'neo-necrohacker' 
+    );
+
+    # store has both 'yanick' and 'yenzie'
+
+    # does not modify the store
+    $blog_entry->author( $pseudonym );
+
+    # removes 'yanick'
+    $blog_entry->save;
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2013, 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
