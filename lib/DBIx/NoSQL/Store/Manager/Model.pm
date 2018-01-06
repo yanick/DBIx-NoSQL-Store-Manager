@@ -129,6 +129,12 @@ sub _entity($self) {
    return $self->pack; 
 }
 
+around pack => sub($orig,$self) {
+    local $DBIx::NoSQL::Store::Manager::Model::INNER_PACKING = $DBIx::NoSQL::Store::Manager::Model::INNER_PACKING;
+
+    return $DBIx::NoSQL::Store::Manager::Model::INNER_PACKING++ ? $self->store_key : $orig->($self);
+};
+
 sub indexes($self) {
     return map  { [ $_->name, ( isa => $_->store_isa ) x $_->has_store_isa ] }
            grep { $_->does('DBIx::NoSQL::Store::Manager::StoreIndex') } 
