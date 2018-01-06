@@ -5,6 +5,8 @@ Revision history for DBIx-NoSQL-Store-Manager
  - 'create()' now saves the new object in the store  upon creation.
 
  [IMPROVEMENTS]
+ - added StoreModel trait, to have attributes that are themselves store
+    objects.
  - $store->set($object) figures out which model to use based on the object's
    class.
 
